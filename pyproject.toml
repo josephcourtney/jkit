@@ -1,0 +1,24 @@
+[build-system]
+requires = ["setuptools >= 40.8.0"]
+
+[project]
+name = "jkit"
+version = "0.0.1"
+authors = [
+    {name = "Joseph Courtney", email = "joseph.m.courtney@gmail.com"},
+]
+description = ""
+readme = ""
+requires-python = ">=3.8"
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "License :: OSI Approved :: MIT License",
+    "Natural Language :: English",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python",
+    "Programming Language :: Python :: 3.8",
+    "Programming Language :: Python :: 3.9",
+]
+dependencies = [
+"numpy"
+]

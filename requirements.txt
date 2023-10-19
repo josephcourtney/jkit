@@ -1,0 +1,16 @@
+biopython
+pandas
+tqdm
+scipy
+rich
+joblib
+matplotlib
+shapely
+nmrglue
+mdtraj
+pynmrstar
+cctbx
+
+# openmm
+# simtk
+# pdbfixer
