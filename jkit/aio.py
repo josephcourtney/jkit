@@ -226,7 +226,7 @@ async def amerge(
     """
     async_iterables = [
         it
-        if isinstance(it, SupportsAnext)
+        if hasattr(it, '__anext__')
         else make_iterable_async(it)
         for it in iterables
     ]

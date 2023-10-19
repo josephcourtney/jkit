@@ -32,7 +32,7 @@ class TimeLimit:
         ----------
         duration : float
             duration of time limit in seconds
-        clock_type : TimerEnum|str, either TimerEnum.{REAL, USER, TOTAL} or '{REAL|USER|TOTAL}'
+        clock_type : TimerEnum|str, either TimerEnum.{REAL, USER, TOTAL} or {'REAL', 'USER', 'TOTAL'}
             The type of clock to use for timing execution. REAL measures real time. USER only measures
             time while the process is executing. TOTAL measures time both when the process is executing
             and when the system is executing on behalf of the process.
