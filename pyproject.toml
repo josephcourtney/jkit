@@ -3,7 +3,7 @@ requires = ["setuptools >= 40.8.0"]
 
 [project]
 name = "jkit"
-version = "0.0.2"
+version = "0.0.3"
 authors = [
     {name = "Joseph Courtney", email = "joseph.m.courtney@gmail.com"},
 ]
