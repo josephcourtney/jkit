@@ -1,24 +1,8 @@
-import base64
-import fcntl
-import io
-import math
-import sys
-import termios
-import time
-import zlib
-from array import array
-from collections.abc import Callable, Iterator
-from contextlib import contextmanager
-from dataclasses import dataclass
-from shutil import get_terminal_size
-
-import matplotlib as mpl
-import matplotlib.pyplot as plt
-from PIL import Image
 import shutil
 import subprocess  # noqa: S404 # each use is secure as long as PATH environment variable hasn't been manipulated
 import sys
 from io import BytesIO
+from typing import Any
 
 import matplotlib.pyplot as plt
 
@@ -38,17 +22,22 @@ if sys.flags.interactive:
 class FigureManagerICat(FigureManagerBase):
     def show(self):
         tput_path = shutil.which("tput")
-        tput_lines = subprocess.run(
-            [tput_path, "lines"],  # noqa: S603
-            capture_output=True,
-            text=True,
-            check=False,
-        )
-        rows = int(tput_lines.stdout.rstrip())
+        if tput_path:
+            tput_lines = subprocess.run(  # noqa: S603
+                [tput_path, "lines"],
+                capture_output=True,
+                text=True,
+                check=False,
+            )
+            rows = int(tput_lines.stdout.rstrip())
+        else:
+            rows = 24  # Default fallback value if tput is not found
 
-        kitty_path = shutil.which("kitty")
-        icat_px = subprocess.run(
-            [  # noqa: S603
+        if (kitty_path := shutil.which("kitty")) is None:
+            msg = "The 'kitty' binary cannot be found. Make sure it is in your PATH."
+            raise FileNotFoundError(msg)
+        icat_px = subprocess.run(  # noqa: S603
+            [
                 kitty_path,
                 "+kitten",
                 "icat",
@@ -78,8 +67,8 @@ class FigureManagerICat(FigureManagerBase):
 
         with BytesIO() as buf:
             self.canvas.figure.savefig(buf, format="png", transparent=True)
-            subprocess.run(
-                [  # noqa: S603
+            subprocess.run(  # noqa: S603
+                [
                     kitty_path,
                     "+kitten",
                     "icat",
@@ -87,13 +76,13 @@ class FigureManagerICat(FigureManagerBase):
                     "center",
                 ],
                 input=buf.getbuffer(),
-                stdout=sys.stderr,  # output ot stderr to avoid being piped by default
+                stdout=sys.stderr,
                 check=False,
             )
 
 
 class FigureCanvasICat(FigureCanvasAgg):
-    manager_class = _api.classproperty(lambda _: FigureManagerICat)
+    manager_class: Any = _api.classproperty(lambda _: FigureManagerICat)
 
 
 @_Backend.export
@@ -109,7 +98,9 @@ class _BackendICatAgg(_Backend):
     # that is the presence of axes on the figure.
     @classmethod
     def draw_if_interactive(cls):
-        manager = Gcf.get_active()
+        if (manager := Gcf.get_active()) is None:
+            msg = "the active figure manager does not have a valid canvas"
+            raise ValueError(msg)
         if is_interactive() and manager.canvas.figure.get_axes():
             cls.show()
 

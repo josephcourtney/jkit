@@ -8,7 +8,7 @@ import tzlocal
 NotDefined = object()
 
 
-def nop(*args, **kwargs) -> None:  # noqa: ARG001
+def nop(*args: Any, **kwargs: dict) -> None:
     pass
 
 
@@ -18,7 +18,7 @@ def chunked_iterator(ary, chunk_shape, overlap):
         for j in range(0, ary.shape[i], chunk_shape[i] - overlap[i]):
             slices[i].append(slice(j, min(ary.shape[i] - 1, j + chunk_shape[i])))
     for chnk in itertools.product(*slices):
-        yield tuple([slc.start for slc in chnk]), ary[chnk]
+        yield tuple(slc.start for slc in chnk), ary[chnk]
 
 
 def format_timedelta(td):
@@ -91,5 +91,3 @@ def suppressing_map(
                 yield default
             else:
                 continue
-
-

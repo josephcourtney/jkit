@@ -1,24 +1,94 @@
 [build-system]
-requires = ["setuptools >= 40.8.0"]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
 
 [project]
 name = "jkit"
-version = "0.0.3"
-authors = [
-    {name = "Joseph Courtney", email = "joseph.m.courtney@gmail.com"},
-]
+dynamic = ["version"]
 description = ""
-readme = ""
-requires-python = ">=3.8"
+readme = "README.md"
+requires-python = ">=3.12"
+license = { text = "MIT License" }
+authors = [{ name = "Joseph Courtney", email = "joseph.m.courtney@gmail.com" }]
+urls = { "Homepage" = "https://github.com/josephcourtney/jkit", "Bug Tracker" = "https://github.com/josephcourtney/jkit/issues" }
 classifiers = [
-    "Development Status :: 3 - Alpha",
-    "License :: OSI Approved :: MIT License",
-    "Natural Language :: English",
-    "Operating System :: OS Independent",
-    "Programming Language :: Python",
-    "Programming Language :: Python :: 3.8",
-    "Programming Language :: Python :: 3.9",
+  "Development Status :: 3 - Alpha",
+  "License :: OSI Approved :: MIT License",
+  "Natural Language :: English",
+  "Operating System :: OS Independent",
+  "Programming Language :: Python",
+  "Programming Language :: Python :: 3.8",
+  "Programming Language :: Python :: 3.9",
 ]
 dependencies = [
-"numpy"
+  "matplotlib>=3.9.2",
+  "numpy>=1.24.4",
+  "rich>=13.9.4",
+  "scipy>=1.14.1",
+  "tzlocal>=5.2",
 ]
+
+[dependency-groups]
+dev = [
+  "pytest-asyncio>=0.24.0",
+  "pytest-mock>=3.14.0",
+  "coverage>=7.6.10",
+  "mypy>=1.14.1",
+  "pytest-check>=2.4.1",
+  "pytest>=8.3.4",
+  "pytest-cov>=6.0.0",
+  "ruff>=0.9.1",
+]
+
+[tool.hatch.build]
+includes = ["src/jkit/**"]
+
+[tool.hatch.version]
+path = "src/jkit/__version__.py"
+
+[tool.ruff]
+extend = "./ruff.default.toml"
+
+[tool.ruff.lint]
+ignore = []
+
+[tool.mypy]
+python_version = "3.12"
+check_untyped_defs = true
+disallow_untyped_defs = true
+exclude = "^tests/"
+plugins = []
+
+[tool.pytest.ini_options]
+addopts = "--cov=jkit --cov-report=xml --cov-report=term-missing"
+testpaths = ["tests"]
+asyncio_default_fixture_loop_scope = "function"
+
+[tool.coverage.run]
+branch = true
+source = ["."]
+
+[tool.coverage.report]
+show_missing = true
+skip_covered = true
+# Regexes for lines to exclude from consideration
+exclude_also = [
+  # Don't complain about missing debug-only code:
+  "def __repr__",
+  "if self\\.debug",
+
+  # Don't complain if tests don't hit defensive assertion code:
+  "raise AssertionError",
+  "raise NotImplementedError",
+
+  # Don't complain if non-runnable code isn't run:
+  "if 0:",
+  "if __name__ == .__main__.:",
+
+  # Don't complain about abstract methods, they aren't run:
+  "@(abc\\.)?abstractmethod",
+]
+ignore_errors = true
+
+[tool.coverage.xml]
+output = "cov.xml"
