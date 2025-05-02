@@ -4,7 +4,6 @@ import warnings
 
 from . import (
     amino_acids,
-    kitty_backend,
     plot,
     util,
     warn_with_traceback,
@@ -12,7 +11,6 @@ from . import (
 
 __all__ = [
     "amino_acids",
-    "kitty_backend",
     "plot",
     "util",
     "warn_with_traceback",

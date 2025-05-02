@@ -1,94 +1,142 @@
-[build-system]
-requires = ["hatchling"]
-build-backend = "hatchling.build"
-
+# =================================== project ====================================
 [project]
-name = "jkit"
-dynamic = ["version"]
-description = ""
-readme = "README.md"
-requires-python = ">=3.12"
-license = { text = "MIT License" }
-authors = [{ name = "Joseph Courtney", email = "joseph.m.courtney@gmail.com" }]
-urls = { "Homepage" = "https://github.com/josephcourtney/jkit", "Bug Tracker" = "https://github.com/josephcourtney/jkit/issues" }
-classifiers = [
-  "Development Status :: 3 - Alpha",
-  "License :: OSI Approved :: MIT License",
-  "Natural Language :: English",
-  "Operating System :: OS Independent",
-  "Programming Language :: Python",
-  "Programming Language :: Python :: 3.8",
-  "Programming Language :: Python :: 3.9",
-]
-dependencies = [
-  "matplotlib>=3.9.2",
-  "numpy>=1.24.4",
-  "rich>=13.9.4",
-  "scipy>=1.14.1",
-  "tzlocal>=5.2",
-]
+  name = "jkit"
+  version = "0.0.8"
+  description = ""
+  readme = "README.md"
+  authors = [
+    { name = "Joseph Courtney", email = "joseph.m.courtney@gmail.com" },
+  ]
+  urls = { "Homepage" = "https://github.com/josephcourtney/jkit", "Bug Tracker" = "https://github.com/josephcourtney/jkit/issues" }
+  license = { text = "MIT License" }
+  classifiers = [
+    "Development Status :: 3 - Alpha",
+    "License :: OSI Approved :: MIT License",
+    "Natural Language :: English",
+    "Operating System :: OS Independent",
+  ]
+  requires-python = ">=3.12"
+  dependencies = [
+    "matplotlib>=3.10.1",
+    "numpy>=2.2.5",
+    "scipy>=1.15.2",
+    "tzlocal>=5.3.1",
+  ]
 
 [dependency-groups]
-dev = [
-  "pytest-asyncio>=0.24.0",
-  "pytest-mock>=3.14.0",
-  "coverage>=7.6.10",
-  "mypy>=1.14.1",
-  "pytest-check>=2.4.1",
-  "pytest>=8.3.4",
-  "pytest-cov>=6.0.0",
-  "ruff>=0.9.1",
-]
+  dev = [
+    "basedpyright>=1.29.1",
+    "commitizen>=4.6.0",
+    "coverage>=7.8.0",
+    "freezegun>=1.5.1",
+    "pytest>=8.3.5",
+    "pytest-asyncio>=0.26.0",
+    "pytest-check>=2.5.3",
+    "pytest-cov>=6.1.1",
+    "pytest-mock>=3.14.0",
+    "pytest-randomly>=3.16.0",
+    "ruff>=0.11.8",
+  ]
 
-[tool.hatch.build]
-includes = ["src/jkit/**"]
+# =================================== build ====================================
+[build-system]
+  requires      = ["uv_build>=0.6,<0.7"]
+  build-backend = "uv_build"
 
-[tool.hatch.version]
-path = "src/jkit/__version__.py"
 
+# ==================================== lint ====================================
 [tool.ruff]
-extend = "./ruff.default.toml"
+  extend = "./ruff.default.toml"
 
-[tool.ruff.lint]
-ignore = []
+  [tool.ruff.lint]
+    ignore = [
+      # "TD002",  # Missing author in TODO; try: `# TODO(<author_name>): ...` or `# TODO @<author_name>: ...`
+      # "TD003",  # Missing issue link for this TODO
+      # "FIX002", # Line contains TODO, consider resolving the issue
+    ]
 
-[tool.mypy]
-python_version = "3.12"
-check_untyped_defs = true
-disallow_untyped_defs = true
-exclude = "^tests/"
-plugins = []
+# =================================== typecheck ===================================
+[tool.basedpyright]
+  typeCheckingMode = "recommended"
+  pythonVersion = "3.13"
+  pythonPlatform = "Darwin"
+  reportImplicitOverride = false
+  reportMissingTypeStubs = false
+  reportUnusedParameter = false
+  executionEnvironments = [
+    { root = "tests", reportPrivateUsage = false, reportUnusedCallResult = false, extraPaths = [] },
+  ]
 
+
+# =================================== test ===================================
 [tool.pytest.ini_options]
-addopts = "--cov=jkit --cov-report=xml --cov-report=term-missing"
-testpaths = ["tests"]
-asyncio_default_fixture_loop_scope = "function"
+  addopts = [
+    "--cov=jkit",
+    "--cov-report=xml",
+    "--cov-report=term-missing",
+  ]
+  testpaths = ["tests"]
+  asyncio_default_fixture_loop_scope = "function"
 
+# =================================== test:coverage ===================================
 [tool.coverage.run]
-branch = true
-source = ["."]
+  source   = ["src/jkit"]
+  branch   = true
+  parallel = true
 
 [tool.coverage.report]
-show_missing = true
-skip_covered = true
-# Regexes for lines to exclude from consideration
-exclude_also = [
-  # Don't complain about missing debug-only code:
-  "def __repr__",
-  "if self\\.debug",
+  show_missing = true
+  skip_covered = true
+  # Regexes for lines to exclude from consideration
+  exclude_also = [
+    # Don't complain about missing debug-only code:
+    "def __repr__",
+    "if self\\.debug",
 
-  # Don't complain if tests don't hit defensive assertion code:
-  "raise AssertionError",
-  "raise NotImplementedError",
+    # Don't complain if tests don't hit defensive assertion code:
+    "raise AssertionError",
+    "raise NotImplementedError",
 
-  # Don't complain if non-runnable code isn't run:
-  "if 0:",
-  "if __name__ == .__main__.:",
+    # Don't complain if non-runnable code isn't run:
+    "if 0:",
+    "if __name__ == .__main__.:",
 
-  # Don't complain about abstract methods, they aren't run:
-  "@(abc\\.)?abstractmethod",
-]
-ignore_errors = true
+    # Don't complain about abstract methods, they aren't run:
+    "@(abc\\.)?abstractmethod",
+  ]
+  ignore_errors = true
 
 [tool.coverage.xml]
-output = "cov.xml"
+  output = ".coverage.xml"
+
+[tool.uv.sources]
+  awl = { git = "https://github.com/josephcourtney/awl" }
+
+[tool.commitizen]
+  name                     = "cz_conventional_commits"
+  tag_format               = "v{version}"
+  update_changelog_on_bump = true
+  bump_message             = "chore: bump version to {new_version}"
+  major_version_zero       = true
+  version_provider         = "uv"
+
+  # Define the allowed commit types and their descriptions:
+  [tool.commitizen.types]
+    feat     = "A new feature"
+    fix      = "A bug fix"
+    docs     = "Documentation only changes"
+    style    = "Code style (formatting, missing semi-colons, etc.)"
+    refactor = "Refactoring code without feature changes"
+    perf     = "Performance improvements"
+    test     = "Adding missing tests or correcting existing ones"
+    ci       = "CI configuration changes"
+    chore    = "Other changes that don't modify src or tests"
+
+  # Define your scopes so people choose from a fixed list:
+  [tool.commitizen.scopes]
+    router     = "Changes to routing logic"
+    dispatcher = "Changes to dispatcher/handler plumbing"
+    cache      = "Caching layer updates"
+    api        = "API‐layer changes"
+    docs       = "Documentation"
+    tests      = "Test suite changes"
