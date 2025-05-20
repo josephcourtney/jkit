@@ -7,8 +7,6 @@ from . import (
     plot,
     util,
     warn_with_traceback,
-    kitty_backend,
-    rich,
 )
 
 __all__ = [
@@ -16,8 +14,6 @@ __all__ = [
     "plot",
     "util",
     "warn_with_traceback",
-    "kitty_backend",
-    "rich",
 ]
 
 
