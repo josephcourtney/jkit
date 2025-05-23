@@ -21,7 +21,8 @@
     "numpy>=2.2.5",
     "scipy>=1.15.2",
     "tzlocal>=5.3.1",
-  ]
+    "wskr",
+]
 
 [dependency-groups]
   dev = [
@@ -111,6 +112,7 @@
 
 [tool.uv.sources]
   awl = { git = "https://github.com/josephcourtney/awl" }
+wskr = { git = "ssh://git@github.com-josephcourtney/josephcourtney/wskr.git" }
 
 [tool.commitizen]
   name                     = "cz_conventional_commits"

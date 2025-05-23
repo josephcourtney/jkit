@@ -4,7 +4,7 @@ from pathlib import Path
 
 import pytest
 
-from jkit.path import normalize_path_input, unpropagated_changes
+from jkit.path import normalize_paths, unpropagated_changes
 
 
 def test_directory_expansion(tmp_path):
@@ -137,7 +137,7 @@ def test_single_existing_path(tmp_path, monkeypatch):
     test_file = tmp_path / "test.txt"
     test_file.touch()
 
-    result = list(normalize_path_input(test_file))
+    result = list(normalize_paths(test_file))
     assert len(result) == 1
     assert result[0] == test_file.resolve()
 
@@ -150,7 +150,7 @@ def test_recursive_glob(tmp_path, monkeypatch):
     subdir.mkdir()
     (subdir / "nested.txt").touch()
 
-    result = list(normalize_path_input("**/*.txt"))
+    result = list(normalize_paths("**/*.txt"))
     resolved_tmp = tmp_path.resolve()
     expected = {resolved_tmp / "root.txt", resolved_tmp / "sub/nested.txt"}
     assert set(result) == expected
@@ -167,7 +167,7 @@ def test_nested_iterables(tmp_path, monkeypatch):
 
     input_arg = [Path("iter.txt"), "data.csv", ["nested/*.txt", "nonexistent.file"], [["*.csv"]]]
 
-    result = set(normalize_path_input(input_arg))
+    result = set(normalize_paths(input_arg))
     resolved_tmp = tmp_path.resolve()
     expected = {
         resolved_tmp / "iter.txt",
@@ -179,9 +179,9 @@ def test_nested_iterables(tmp_path, monkeypatch):
 
 def test_non_existing_paths(tmp_path):
     """Test paths that don't exist are skipped."""
-    result = list(normalize_path_input(tmp_path / "ghost.txt"))
+    result = list(normalize_paths(tmp_path / "ghost.txt"))
     assert not result
-    result = list(normalize_path_input("phantom.csv"))
+    result = list(normalize_paths("phantom.csv"))
     assert not result
 
 
@@ -192,19 +192,19 @@ def test_absolute_paths(tmp_path, monkeypatch):
     abs_file.touch()
 
     # Absolute Path object
-    result = list(normalize_path_input(abs_file))
+    result = list(normalize_paths(abs_file))
     assert result[0] == abs_file.resolve()
 
     # Absolute string path
-    result = list(normalize_path_input(str(abs_file)))
+    result = list(normalize_paths(str(abs_file)))
     assert result[0] == abs_file.resolve()
 
 
 def test_edge_cases():
     """Test empty iterables and invalid types."""
-    assert not list(normalize_path_input([]))
+    assert not list(normalize_paths([]))
     with pytest.raises(TypeError):
-        list(normalize_path_input(123))
+        list(normalize_paths(123))
 
 
 def test_complex_mixed_case(tmp_path, monkeypatch):
@@ -218,7 +218,7 @@ def test_complex_mixed_case(tmp_path, monkeypatch):
 
     input_arg = [Path("mix1.txt"), "mix2.csv", ["mixed/*.txt", Path("non_existent.dir")]]
 
-    result = set(normalize_path_input(input_arg))
+    result = set(normalize_paths(input_arg))
     resolved_tmp = tmp_path.resolve()
     expected = {
         resolved_tmp / "mix1.txt",
@@ -247,7 +247,7 @@ def test_no_target_files(tmp_path):
 def test_hidden_files(tmp_path):
     hidden_file = tmp_path / ".hidden"
     hidden_file.touch()
-    result = list(normalize_path_input(hidden_file))
+    result = list(normalize_paths(hidden_file))
     assert result == [hidden_file.resolve()]
 
 
@@ -256,14 +256,14 @@ def test_symlinks(tmp_path):
     target.touch()
     symlink = tmp_path / "symlink.txt"
     symlink.symlink_to(target)
-    result = list(normalize_path_input(symlink))
+    result = list(normalize_paths(symlink))
     assert result == [target.resolve()]
 
 
 def test_unicode_paths(tmp_path):
     unicode_file = tmp_path / " Café ☕.txt"
     unicode_file.touch()
-    result = list(normalize_path_input(unicode_file))
+    result = list(normalize_paths(unicode_file))
     assert result == [unicode_file.resolve()]
 
 
@@ -272,7 +272,7 @@ def test_permission_denied(tmp_path):
     restricted_file.touch()
     restricted_file.chmod(0o000)  # No permissions
     try:
-        result = list(normalize_path_input(restricted_file))
+        result = list(normalize_paths(restricted_file))
         assert not result  # Should skip inaccessible files
     finally:
         # Reset permissions to allow cleanup
@@ -280,7 +280,7 @@ def test_permission_denied(tmp_path):
 
 
 def test_invalid_glob():
-    result = list(normalize_path_input("invalid[glob"))
+    result = list(normalize_paths("invalid[glob"))
     assert not result  # Should handle invalid globs gracefully
 
 
@@ -332,7 +332,7 @@ def test_complex_setup(tmp_path_factory):
     restricted_file.touch()
     restricted_file.chmod(0o000)  # No permissions
     try:
-        result = list(normalize_path_input(restricted_file))
+        result = list(normalize_paths(restricted_file))
         assert not result  # Should skip inaccessible files
     finally:
         # Reset permissions to allow cleanup

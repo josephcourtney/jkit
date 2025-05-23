@@ -1,8 +1,18 @@
+from __future__ import annotations
+
+from types import MethodType
+
 import matplotlib.pyplot as plt
 import numpy as np
 from matplotlib import cm
+from matplotlib.cbook import Grouper
 from matplotlib.colors import Normalize
+from rich.console import Console
+from rich.table import Table
 from scipy.interpolate import interpn
+from wskr.rich.plt import RichPlot, dpi_macbook_pro_13in_m2_2022, get_terminal_size
+
+rng = np.random.default_rng()
 
 
 def create_share_dict(share_param, ranges):
@@ -12,10 +22,25 @@ def create_share_dict(share_param, ranges):
         if share_param is True:
             for i in range(1, len(ranges)):
                 share_dic[i] = 0
-        else:
+        elif isinstance(share_param, str):
+            if share_param in {"row", "col"}:
+                groups = {}
+                for idx, (r0, _r1, c0, _c1) in enumerate(ranges):
+                    key = r0 if share_param == "row" else c0
+                    groups.setdefault(key, []).append(idx)
+            else:
+                msg = f"sharex must be bool, list of tuples, 'row', or 'col'; got {share_param!r}"
+                raise ValueError(msg)
+        elif (
+            isinstance(share_param, list)
+            and all(isinstance(e, tuple) for e in share_param)
+            and all(isinstance(e_1, int) for e_0 in share_param for e_1 in e_0)
+        ):
             for group in share_param:
                 for subplot_index in group[1:]:
                     share_dic[subplot_index] = group[0]
+            msg = f"sharex must be bool, list of tuples, 'row', or 'col'; got {share_param!r}"
+            raise ValueError(msg)
     return share_dic
 
 
@@ -36,18 +61,32 @@ def initialize_subplots(
     """Initialize subplots within the figure."""
     ax = np.empty(len(ranges), dtype=object)
     for i, rng in enumerate(ranges):
-        kwargs_ = kwargs.copy()
-        if subplot_kwargs and i in subplot_kwargs:
-            kwargs_.update(subplot_kwargs[i])
+        # merge base kwargs with any per-subplot overrides
+        overrides = subplot_kwargs.get(i, {}) if subplot_kwargs else {}
+        kwargs_ = {**kwargs, **overrides}
 
         share_x = ax[sharex_dict[i]] if i in sharex_dict else None
         share_y = ax[sharey_dict[i]] if i in sharey_dict else None
         if kwargs_.get("projection") == "3d" and i in sharez_dict:
             kwargs_["sharez"] = ax[sharez_dict[i]]
 
-        ax[i] = fig.add_subplot(
-            gs[rng[0] : rng[1] + 1, rng[2] : rng[3] + 1], *args, sharex=share_x, sharey=share_y, **kwargs_
+        axis = fig.add_subplot(
+            gs[rng[0] : rng[1] + 1, rng[2] : rng[3] + 1],
+            *args,
+            sharex=share_x,
+            sharey=share_y,
+            **kwargs_,
         )
+
+        # If this is a 3D subplot, give it get_shared_z_axes()
+        if kwargs_.get("projection") == "3d":
+
+            def get_shared_z_axes(self):
+                return self._shared_z_axes
+
+            axis.get_shared_z_axes = MethodType(get_shared_z_axes, axis)
+        ax[i] = axis
+
     return ax
 
 
@@ -123,6 +162,12 @@ def make_plot_grid(
         GridSpec instance used to create the subplots.
 
     """
+    if sharez and sharez is not True:
+        subplot_kwargs = subplot_kwargs or {}
+        for group in sharez:
+            for idx in group:
+                subplot_kwargs.setdefault(idx, {}).setdefault("projection", "3d")
+
     gs_kwargs = gs_kwargs or {}
     figure_kwargs = figure_kwargs or {}
 
@@ -139,8 +184,31 @@ def make_plot_grid(
     sharez_dict = create_share_dict(sharez, ranges)
 
     ax = initialize_subplots(
-        fig, gs, ranges, sharex_dict, sharey_dict, sharez_dict, subplot_kwargs, *args, **kwargs
+        fig,
+        gs,
+        ranges,
+        sharex_dict,
+        sharey_dict,
+        sharez_dict,
+        subplot_kwargs,
+        *args,
+        **kwargs,
     )
+
+    # Handle 3D Z-axis sharing
+    if sharez and sharez is not True:
+
+        def _get_shared_z_axes(self):
+            return self._shared_z_axes
+
+        for group in sharez:
+            g = Grouper()
+            base_ax = ax[group[0]]
+            for idx in group:
+                g.join(base_ax, ax[idx])
+                axis = ax[idx]
+                axis._shared_z_axes = g  # noqa: SLF001
+                axis.get_shared_z_axes = MethodType(_get_shared_z_axes, axis)
 
     return (fig, ax, gs) if return_gridspec else (fig, ax)
 
@@ -181,3 +249,51 @@ def density_scatter(x, y, ax=None, bins=20, *, sort=True, **kwargs):
     cbar.ax.set_ylabel("Density")
 
     return ax
+
+
+def sparkline(x, y, columns=8, rows=1):
+    fig, ax = make_plot_grid(1, 1)
+    ax[0].plot(x, y, c="w")
+    ax[0].axis("off")
+    ax[0].margins(0)
+    fig.subplots_adjust(left=0, right=1, top=1, bottom=0)
+    return RichPlot(
+        figure=fig,
+        desired_width=columns,
+        desired_height=rows,
+        dpi=dpi_macbook_pro_13in_m2_2022,
+    )
+
+
+if __name__ == "__main__":
+    console = Console()
+    dpi = dpi_macbook_pro_13in_m2_2022
+    w_px, h_px, n_col, n_row = get_terminal_size()
+    print(f"cell size:       {w_px / n_col:>6.2f} x{h_px / n_row:>6.2f} pixels")
+    print(f"cell resolution: {dpi * n_col / w_px:>6.2f} x{dpi * n_row / h_px:>6.2f} cell/inch")
+
+    table = Table(title="Sparklines", show_lines=False)
+    table.add_column("column 1", justify="left")
+    table.add_column("column 2", justify="center")
+    table.add_column("column 3", justify="right")
+    for _i in range(3):
+        table.add_row("name", "detail", sparkline(np.linspace(0, 1, 32), rng.normal(size=32)))
+    console.print(table)
+
+    fig, ax = make_plot_grid(1, 1, figure_kwargs={"layout": "constrained"})
+    x = np.linspace(0, 1, 128)
+    y = np.exp((2j * np.pi * 5 - 3) * x)
+    ax[0].plot(x, y.real, c="w")
+    ax[0].set_xlim(left=0)
+    ax[0].spines["bottom"].set_position("zero")
+    ax[0].spines["top"].set_visible(False)
+    ax[0].spines["right"].set_visible(False)
+    ax[0].xaxis.set_tick_params(which="both", direction="inout")
+    ax[0].xaxis.set_tick_params(which="major", length=7.0)
+    ax[0].xaxis.set_tick_params(which="minor", length=4.0)
+
+    y_max = np.max([abs(e) for e in ax[0].get_ylim()])
+    ax[0].set_ylim(-y_max, y_max)
+
+    rp = RichPlot(figure=fig, desired_width=40, desired_height=20, dpi=dpi_macbook_pro_13in_m2_2022)
+    console.print(rp)
