@@ -1,7 +1,7 @@
 # =================================== project ====================================
 [project]
   name = "jkit"
-  version = "0.0.10"
+  version = "0.0.12"
   description = ""
   readme = "README.md"
   authors = [
@@ -30,6 +30,7 @@
     "commitizen>=4.6.0",
     "coverage>=7.8.0",
     "freezegun>=1.5.1",
+    "pyfakefs>=5.9.2",
     "pytest>=8.3.5",
     "pytest-asyncio>=0.26.0",
     "pytest-check>=2.5.3",

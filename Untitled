@@ -1,0 +1,56 @@
+┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━┳━━━━━┳━━━━━━━━━┓
+┃ File                            ┃ Start ┃ End ┃ # Lines ┃
+┡━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╇━━━━━━━╇━━━━━╇━━━━━━━━━┩
+│ src/jkit/__init__.py            │    22 │  23 │       2 │
+│ src/jkit/__init__.py            │    26 │  30 │       5 │
+│ src/jkit/__init__.py            │    35 │  35 │       1 │
+│ src/jkit/__init__.py            │    40 │  40 │       1 │
+│ src/jkit/__init__.py            │    43 │  43 │       1 │
+│ src/jkit/amino_acids.py         │    92 │ 107 │      16 │
+│ src/jkit/amino_acids.py         │   111 │ 113 │       3 │
+│ src/jkit/amino_acids.py         │   116 │ 118 │       3 │
+│ src/jkit/amino_acids.py         │   122 │ 130 │       9 │
+│ src/jkit/amino_acids.py         │   134 │ 136 │       3 │
+│ src/jkit/amino_acids.py         │   140 │ 143 │       4 │
+│ src/jkit/file_io.py             │    20 │  20 │       1 │
+│ src/jkit/file_io.py             │    24 │  26 │       3 │
+│ src/jkit/file_io.py             │    36 │  37 │       2 │
+│ src/jkit/file_io.py             │    46 │  47 │       2 │
+│ src/jkit/file_io.py             │    57 │  58 │       2 │
+│ src/jkit/file_io.py             │    63 │  65 │       3 │
+│ src/jkit/file_io.py             │    71 │  73 │       3 │
+│ src/jkit/file_io.py             │    77 │  78 │       2 │
+│ src/jkit/file_io.py             │    88 │  94 │       7 │
+│ src/jkit/file_io.py             │   174 │ 174 │       1 │
+│ src/jkit/path.py                │     1 │  21 │      21 │
+│ src/jkit/path.py                │    23 │  60 │      38 │
+│ src/jkit/path.py                │    62 │  69 │       8 │
+│ src/jkit/path.py                │    71 │  71 │       1 │
+│ src/jkit/path.py                │    76 │  76 │       1 │
+│ src/jkit/path.py                │    78 │  90 │      13 │
+│ src/jkit/plot.py                │    19 │  25 │       7 │
+│ src/jkit/plot.py                │    27 │  30 │       4 │
+│ src/jkit/plot.py                │    33 │  37 │       5 │
+│ src/jkit/plot.py                │    42 │  44 │       3 │
+│ src/jkit/plot.py                │    47 │  50 │       4 │
+│ src/jkit/plot.py                │    55 │  61 │       7 │
+│ src/jkit/plot.py                │    68 │  69 │       2 │
+│ src/jkit/plot.py                │    71 │  79 │       9 │
+│ src/jkit/plot.py                │    88 │  96 │       9 │
+│ src/jkit/plot.py                │   171 │ 192 │      22 │
+│ src/jkit/plot.py                │   205 │ 219 │      15 │
+│ src/jkit/plot.py                │   224 │ 230 │       7 │
+│ src/jkit/plot.py                │   235 │ 239 │       5 │
+│ src/jkit/plot.py                │   248 │ 257 │      10 │
+│ src/jkit/plot.py                │   261 │ 266 │       6 │
+│ src/jkit/util.py                │    12 │  12 │       1 │
+│ src/jkit/util.py                │    16 │  21 │       6 │
+│ src/jkit/util.py                │    25 │  37 │      13 │
+│ src/jkit/util.py                │    41 │  41 │       1 │
+│ src/jkit/util.py                │    84 │  91 │       8 │
+│ src/jkit/util.py                │    93 │  93 │       1 │
+│ src/jkit/warn_with_traceback.py │     9 │  16 │       8 │
+│ src/jkit/warn_with_traceback.py │    25 │  25 │       1 │
+│ src/jkit/warn_with_traceback.py │    32 │  32 │       1 │
+│ src/jkit/warn_with_traceback.py │    36 │  36 │       1 │
+└─────────────────────────────────┴───────┴─────┴─────────┘
