@@ -16,31 +16,37 @@ rng = np.random.default_rng()
 
 
 def create_share_dict(share_param, ranges):
-    """Create a dictionary to manage shared axes for subplots."""
     share_dic = {}
     if share_param:
         if share_param is True:
             for i in range(1, len(ranges)):
                 share_dic[i] = 0
-        elif isinstance(share_param, str):
-            if share_param in {"row", "col"}:
-                groups = {}
-                for idx, (r0, _r1, c0, _c1) in enumerate(ranges):
-                    key = r0 if share_param == "row" else c0
-                    groups.setdefault(key, []).append(idx)
-            else:
-                msg = f"sharex must be bool, list of tuples, 'row', or 'col'; got {share_param!r}"
-                raise ValueError(msg)
+
+        elif isinstance(share_param, str) and share_param in {"row", "col"}:
+            # build groups by row or column
+            groups: dict[int, list[int]] = {}
+            for idx, (r0, _r1, c0, _c1) in enumerate(ranges):
+                key = r0 if share_param == "row" else c0
+                groups.setdefault(key, []).append(idx)
+
+            # now populate share_dic exactly like the tuple-list case
+            for group in groups.values():
+                for subplot_index in group[1:]:
+                    share_dic[subplot_index] = group[0]
+
         elif (
             isinstance(share_param, list)
             and all(isinstance(e, tuple) for e in share_param)
-            and all(isinstance(e_1, int) for e_0 in share_param for e_1 in e_0)
+            and all(isinstance(i, int) for tup in share_param for i in tup)
         ):
             for group in share_param:
                 for subplot_index in group[1:]:
                     share_dic[subplot_index] = group[0]
+
+        else:
             msg = f"sharex must be bool, list of tuples, 'row', or 'col'; got {share_param!r}"
             raise ValueError(msg)
+
     return share_dic
 
 
