@@ -113,7 +113,7 @@
 
 [tool.uv.sources]
   awl  = { git = "https://github.com/josephcourtney/awl" }
-  wskr = { git = "ssh://git@github.com-josephcourtney/josephcourtney/wskr.git" }
+  wskr = { git = "ssh://git@github.com/josephcourtney/wskr.git" }
 
 [tool.commitizen]
   name                     = "cz_conventional_commits"
